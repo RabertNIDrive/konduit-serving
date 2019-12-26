@@ -27,28 +27,16 @@ import ai.konduit.serving.config.Input;
 import ai.konduit.serving.config.Output;
 import ai.konduit.serving.config.ServingConfig;
 import ai.konduit.serving.model.PythonConfig;
-import ai.konduit.serving.output.types.NDArrayOutput;
 import ai.konduit.serving.pipeline.step.PythonStep;
-import ai.konduit.serving.util.ObjectMapperHolder;
 import ai.konduit.serving.verticles.inference.InferenceVerticle;
 import ai.konduit.serving.verticles.numpy.tensorflow.BaseMultiNumpyVerticalTest;
 import com.jayway.restassured.specification.RequestSpecification;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
-import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.apache.commons.io.FileUtils;
 import org.datavec.api.transform.schema.Schema;
 import org.datavec.python.PythonVariables;
 import org.junit.After;
@@ -60,10 +48,8 @@ import org.nd4j.linalg.io.ClassPathResource;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -110,12 +96,12 @@ public class KerasTestPythonJsonInputFormat extends BaseMultiNumpyVerticalTest {
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        String pythonCodePath = new ClassPathResource("scripts/KerasJsonTest.py").getFile().getAbsolutePath();
+         String pythonCodePath = new ClassPathResource("scripts/KerasJsonTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
                 .pythonCodePath(pythonCodePath)
                 .pythonInput("JsonInput", PythonVariables.Type.STR.name())
-                .pythonOutput("score", PythonVariables.Type.NDARRAY.name())
+                .pythonOutput("score", PythonVariables.Type.LIST.name())
                 .build();
 
         PythonStep pythonStepConfig = new PythonStep(pythonConfig);
@@ -123,7 +109,7 @@ public class KerasTestPythonJsonInputFormat extends BaseMultiNumpyVerticalTest {
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
                 .inputDataFormat(Input.DataFormat.JSON)
-                //.outputDataFormat(Output.DataFormat.NUMPY)
+                .outputDataFormat(Output.DataFormat.JSON)
                 .predictionType(Output.PredictionType.RAW)
                 .build();
 
@@ -137,6 +123,7 @@ public class KerasTestPythonJsonInputFormat extends BaseMultiNumpyVerticalTest {
 
     @Test(timeout = 60000)
     public void testInferenceResult(TestContext context) throws Exception {
+
         this.context = context;
 
         RequestSpecification requestSpecification = given();
@@ -156,13 +143,9 @@ public class KerasTestPythonJsonInputFormat extends BaseMultiNumpyVerticalTest {
                 .body().asString();
 
         JsonObject jsonObject1 = new JsonObject(output);
-        String ndarraySerde = jsonObject1.getJsonObject("default").toString();
-        NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);
-        INDArray outputArray = nd.getNdArray();
+        List<Float> out = jsonObject1.getJsonArray("score").getList();
+        INDArray outputArray = Nd4j.create(out);
         INDArray expected = outputArray.get();
         assertEquals(expected, outputArray);
-
     }
-
-
 }
