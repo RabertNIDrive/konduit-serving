@@ -3,21 +3,27 @@ import os
 import numpy as np
 from PIL import Image
 
-#from tensorflow.examples.tutorials.mnist import input_data
+work_dir = os.path.abspath("src\test\resources\scripts\TensorFlow")
+print("current_path", work_dir)
+sys.path.append(work_dir)
+
 import input_data
-#import tensorflow as tf
+#work_dir = os.path.abspath("./scripts/input_data.py")
+#sys.path.append(work_dir)
+
+#from tensorflow.examples.tutorials.mnist import input_data
+#import input_data
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
-work_dir = os.path.abspath(".")
-print("Work Directory", work_dir)
+work_dir1 = os.path.abspath(".")
+print("Work Directory", work_dir1)
 
-
-
-ImgPath =("..\\data\\test_img.png")
-print("ImgPath", ImgPath)
+#imgPath1 =("src\\test\\resources\\data\\test_img.png")
+print("imgPath", imgPath)
 
 # This will print 2, which is the value of bias that we saved
-img = np.invert(Image.open(ImgPath).convert('L')).ravel()
+img = np.invert(Image.open(imgPath).convert('L')).ravel()
+print("img", img)
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)  # y labels are oh-encoded
 n_train = mnist.train.num_examples  # 55,000
 n_validation = mnist.validation.num_examples  # 5000

@@ -100,7 +100,7 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        String pythonCodePath = new ClassPathResource("scripts/KerasNDArrayTest.py").getFile().getAbsolutePath();
+        String pythonCodePath = new ClassPathResource("scripts/Keras/KerasNDArrayTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
                 .pythonCodePath(pythonCodePath)
@@ -145,28 +145,26 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
 
 
         BinarySerde.writeArrayToDisk(arr, file);
-        requestSpecification.body(jsonObject.encode());
+      //  requestSpecification.body(jsonObject.encode().getBytes());
 
-        requestSpecification.header("Content-Type", "multipart/form-data");
+     // requestSpecification.header("Content-Type", "multipart/form-data");
 
-        requestSpecification.body(jsonObject.encode().getBytes());
-        String response = Unirest.post("http://localhost:"+port+"/raw/nd4j")
+       // requestSpecification.body(jsonObject.encode().getBytes());
+/*        String response = Unirest.post("http://localhost:"+port+"/raw/nd4j")
                 .field("my_test", file)
                 .asString().getBody();
 
-        System.out.print(response);
+        System.out.print(response);*/
 
-         //jsonObject.put("my_test", jsonArraouter);
-
-/*        requestSpecification.header("Content-Type", "multipart/form-data");
+        //requestSpecification.header("Content-Type", "multipart/form-data");
         String output = requestSpecification.when()
                 .multiPart("my_test",file)
                 .expect().statusCode(200)
                 .post("raw/nd4j").then()
                 .extract()
-                .body().asString();*/
+                .body().asString();
 
-        System.out.println("TEST");
+        System.out.println("TEST"+output);
 
     }
 

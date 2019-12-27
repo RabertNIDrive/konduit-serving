@@ -99,7 +99,7 @@ public class TensorFlowTestPythonImageInput extends BaseMultiNumpyVerticalTest {
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-       String pythonCodePath = new ClassPathResource("scripts/TensorFlowImageTest.py").getFile().getAbsolutePath();
+       String pythonCodePath = new ClassPathResource("scripts/TensorFlow/TensorFlowImageTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
                 .pythonPath("C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\python37.zip;" +
@@ -133,16 +133,15 @@ public class TensorFlowTestPythonImageInput extends BaseMultiNumpyVerticalTest {
         //ServingConfig set httpport and Input Formats
         ServingConfig servingConfig = ServingConfig.builder().httpPort(port).
                 inputDataFormat(Input.DataFormat.IMAGE).
-                //outputDataFormat(Output.DataFormat.NUMPY).
+                outputDataFormat(Output.DataFormat.NUMPY).
                         predictionType(Output.PredictionType.RAW).
                         build();
 
         //Model config and set model type as KERAS
         ImageLoadingStep imageLoadingStep = ImageLoadingStep.builder()
-               // .imageProcessingInitialLayout("NCHW")
-                //.imageProcessingRequiredLayout("NHWC")
                 .inputName("imgPath")
-                //.outputName("imageArray")
+                //.imageProcessingInitialLayout("NCHW")
+                //.imageProcessingRequiredLayout("NHWC")
                 .dimensionsConfig("default", new Long[]{ 240L, 320L, 3L }) // Height, width, channels
                 .build();
 
@@ -162,7 +161,6 @@ public class TensorFlowTestPythonImageInput extends BaseMultiNumpyVerticalTest {
         requestSpecification.port(port);
 
         JsonObject jsonObject = new JsonObject();
-       // requestSpecification.body(jsonObject.encode().getBytes());
         requestSpecification.body(jsonObject.encode());
         requestSpecification.header("Content-Type", "multipart/form-data");
 

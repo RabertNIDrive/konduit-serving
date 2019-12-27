@@ -99,7 +99,7 @@ public class KerasTestPythonImageInput extends BaseMultiNumpyVerticalTest {
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        String pythonCodePath = new ClassPathResource("scripts/KerasImageTest.py").getFile().getAbsolutePath();
+        String pythonCodePath = new ClassPathResource("scripts/Keras/KerasImageTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
                 .pythonCodePath(pythonCodePath)
