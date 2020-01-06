@@ -150,32 +150,6 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
     @Test(timeout = 60000)
     public void testInferenceResult(TestContext context) throws Exception {
         this.context = context;
-      /*   RequestSpecification requestSpecification = given();
-        requestSpecification.port(port);
-        JsonObject jsonObject = new JsonObject();
-       INDArray arr = Nd4j.create(new float[][] {{1, 0, 5, 10 }, {100,55, 555, 1000}});
-        INDArray inputArray = Nd4j.onesLike(arr);
-        //INDArray inputArray = Nd4j.ones(3, 2);
-        requestSpecification.body(jsonObject.encode().getBytes());
-        jsonObject.put("my_test", new JsonArray(arr.toString()));
-        requestSpecification.body(jsonObject.encode().getBytes());
-        requestSpecification.header("Content-Type", "application/json");
-        String body = requestSpecification.when()
-                .expect().statusCode(200)
-                .body(not(isEmptyOrNullString()))
-                .post("/raw/dictionary").then()
-                .extract()
-                .body().asString();
-        JsonObject jsonObject1 = new JsonObject(body);
-        String ndarraySerde = jsonObject1.getJsonObject("default").toString();
-        NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);
-        INDArray outputArray = nd.getNdArray();
-        //INDArray expected = inputArray.add(2);
-        INDArray expected = Nd4j.create(new double[][] {{0.1628401,0.7828045,0.05435541}, {0.0,1.0,0.0}});
-        assertEquals(expected, outputArray);*/
-
-        this.context = context;
-
         RequestSpecification requestSpecification = given();
         requestSpecification.port(port);
         JsonObject jsonObject = new JsonObject();
@@ -195,22 +169,22 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
         BinarySerde.writeArrayToDisk(arr, file);
         requestSpecification.body(jsonObject.encode().getBytes());
 
-/*        requestSpecification.body(jsonObject.encode().getBytes());
+        requestSpecification.header("Content-Type", "multipart/form-data");
         String response = Unirest.post("http://localhost:"+port+"/raw/nd4j")
                 .field("my_test", file)
                 .asString().getBody();
 
-        System.out.print(response);*/
+        System.out.print(response);
 
          //jsonObject.put("my_test", jsonArraouter);
 
-        requestSpecification.header("Content-Type", "multipart/form-data");
+ /*       requestSpecification.header("Content-Type", "multipart/form-data");
         String output = requestSpecification.when()
                 .multiPart("my_test",file)
                 .expect().statusCode(200)
                 .post("raw/numpy").then()
                 .extract()
-                .body().asString();
+                .body().asString();*/
 
 /*        JsonObject jsonObject1 = new JsonObject(body);
         String ndarraySerde = jsonObject1.getJsonObject("arr").toString();

@@ -125,7 +125,7 @@ public class TensorFlowTestPythonImageInput extends BaseMultiNumpyVerticalTest {
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\jnius-1.1.0-py3.7-win-amd64.egg;")
                 .pythonCodePath(pythonCodePath)
                 .pythonInput("img", PythonVariables.Type.NDARRAY.name())
-                .pythonOutput("arr", PythonVariables.Type.NDARRAY.name())
+                .pythonOutput("prediction", PythonVariables.Type.NDARRAY.name())
                 .build();
 
         PythonStep pythonStepConfig = new PythonStep(pythonConfig);
