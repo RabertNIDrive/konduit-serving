@@ -100,7 +100,7 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        String pythonCodePath = new ClassPathResource("scripts/KerasNDArrayTest.py").getFile().getAbsolutePath();
+        String pythonCodePath = new ClassPathResource("scripts/keras/KerasNDArrayTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
                 .pythonPath("C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\python37.zip;" +
