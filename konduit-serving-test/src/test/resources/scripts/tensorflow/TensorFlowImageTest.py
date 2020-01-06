@@ -94,8 +94,8 @@ for i in range(n_iterations):
 
 print("Model saved as tensosFlow_Image")
 
-
-prediction = sess.run(tf.argmax(output_layer, 1), feed_dict={X: [img]})
+XTestImg = img.reshape(784)
+prediction = sess.run(tf.argmax(output_layer, 1), feed_dict={X: [XTestImg]})
 print ("Prediction for test image:", np.squeeze(prediction))
 
 sess.close()

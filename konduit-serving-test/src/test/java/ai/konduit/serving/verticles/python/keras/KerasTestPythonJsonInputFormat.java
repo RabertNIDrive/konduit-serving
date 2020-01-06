@@ -177,6 +177,7 @@ public class KerasTestPythonJsonInputFormat extends BaseMultiNumpyVerticalTest {
                 .extract()
                 .body().asString();
 
+
         JsonObject jsonObject1 = new JsonObject(output);
         String ndarraySerde = jsonObject1.getJsonObject("default").toString();
         NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);
