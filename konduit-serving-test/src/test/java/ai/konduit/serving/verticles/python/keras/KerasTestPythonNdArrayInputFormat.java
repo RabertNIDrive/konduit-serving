@@ -100,9 +100,31 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        String pythonCodePath = new ClassPathResource("scripts/Keras/KerasNDArrayTest.py").getFile().getAbsolutePath();
+        String pythonCodePath = new ClassPathResource("scripts/keras/KerasNDArrayTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
+                .pythonPath("C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\python37.zip;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\DLLs;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages\\win32;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages\\win32\\lib;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages\\Pythonwin;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pyyaml-5.2-py3.7-win-amd64.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\click-7.0-py3.7.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pydatavec-0.1.2-py3.7.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pydl4j-0.1.4-py3.7.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\cython-0.29.14-py3.7-win-amd64.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pandas-0.24.2-py3.7-win-amd64.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\requests_toolbelt-0.9.1-py3.7.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pyarrow-0.13.0-py3.7-win-amd64.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\numpy-1.16.4-py3.7-win-amd64.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\requests-2.22.0-py3.7.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\python_dateutil-2.8.1-py3.7.egg;" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\jnius-1.1.0-py3.7-win-amd64.egg;")
+
                 .pythonCodePath(pythonCodePath)
                 .pythonInput("my_test", PythonVariables.Type.NDARRAY.name())
                 .pythonOutput("arr", PythonVariables.Type.NDARRAY.name())
@@ -113,7 +135,7 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
                 .inputDataFormat(Input.DataFormat.NUMPY)
-                .outputDataFormat(Output.DataFormat.NUMPY)
+                //.outputDataFormat(Output.DataFormat.NUMPY)
                 .predictionType(Output.PredictionType.RAW)
                 .build();
 
@@ -145,26 +167,29 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
 
 
         BinarySerde.writeArrayToDisk(arr, file);
-      //  requestSpecification.body(jsonObject.encode().getBytes());
+        requestSpecification.body(jsonObject.encode().getBytes());
 
-     // requestSpecification.header("Content-Type", "multipart/form-data");
-
-       // requestSpecification.body(jsonObject.encode().getBytes());
-/*        String response = Unirest.post("http://localhost:"+port+"/raw/nd4j")
+        requestSpecification.header("Content-Type", "multipart/form-data");
+        String response = Unirest.post("http://localhost:"+port+"/raw/nd4j")
                 .field("my_test", file)
                 .asString().getBody();
 
-        System.out.print(response);*/
+        System.out.print(response);
 
-        //requestSpecification.header("Content-Type", "multipart/form-data");
+         //jsonObject.put("my_test", jsonArraouter);
+
+ /*       requestSpecification.header("Content-Type", "multipart/form-data");
         String output = requestSpecification.when()
                 .multiPart("my_test",file)
                 .expect().statusCode(200)
-                .post("raw/nd4j").then()
+                .post("raw/numpy").then()
                 .extract()
-                .body().asString();
+                .body().asString();*/
 
-        System.out.println("TEST"+output);
+/*        JsonObject jsonObject1 = new JsonObject(body);
+        String ndarraySerde = jsonObject1.getJsonObject("arr").toString();
+        NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);*/
+
 
     }
 
