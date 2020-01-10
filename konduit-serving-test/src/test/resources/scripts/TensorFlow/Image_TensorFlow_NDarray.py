@@ -1,10 +1,12 @@
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-from tensorflow.examples.tutorials.mnist import input_data
-import os
 work_dir = os.path.abspath(".")
 print("work_dir",work_dir)
+#from tensorflow.examples.tutorials.mnist import input_data
+#import input_data
+import os
+
 
 #ImgPath ="test_img.png"
 imgPath =("src\\test\\resources\\data\\test_img.png")
