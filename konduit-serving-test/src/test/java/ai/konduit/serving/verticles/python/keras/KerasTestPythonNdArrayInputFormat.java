@@ -23,7 +23,6 @@
 package ai.konduit.serving.verticles.python.keras;
 
 import ai.konduit.serving.InferenceConfiguration;
-import ai.konduit.serving.config.Input;
 import ai.konduit.serving.config.Output;
 import ai.konduit.serving.config.ServingConfig;
 import ai.konduit.serving.model.PythonConfig;
@@ -95,29 +94,10 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
                 .filter(Objects::nonNull)
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
-
-/*
-
-        String  pythonPath = "C:\\Users\\venkat-nidrive\\.javacpp\\cache\\cpython-3.7.3-1.5.1-windows-x86_64.jar\\org\\bytedeco\\cpython\\windows-x86_64\\\n" +
-                "lib;C:\\Users\\venkat-nidrive\\.javacpp\\cache\\cpython-3.7.3-1.5.1-windows-x86_64.jar\\org\\bytedeco\\cpython\\windows-x86_64\\lib\\python3.7;\n" +
-                "C:\\Users\\venkat-nidrive\\.javacpp\\cache\\cpython-3.7.3-1.5.1-windows-x86_64.jar\\org\\bytedeco\\cpython\\windows-x86_64\\lib\\python3.7\\lib-dynload;\n" +
-                "C:\\Users\\venkat-nidrive\\.javacpp\\cache\\cpython-3.7.3-1.5.1-windows-x86_64.jar\\org\\bytedeco\\cpython\\windows-x86_64\\lib\\python3.7\\site-packages;\n" +
-                "C:\\Users\\venkat-nidrive\\.javacpp\\cache\\numpy-1.16.4-1.5.1-windows-x86_64.jar\\org\\bytedeco\\numpy\\\n" +
-                "windows-x86_64\\python";
-*/
-
         String pythonCodePath = new ClassPathResource("scripts/keras/KerasNDArrayTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
-         //       .pythonPath(pythonPath)
-                .pythonPath("C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37\\python37.zip;" +
-                                "C:\\Users\\venkat-nidrive`AppData\\Local\\Programs\\Python\\Python37\\" +
-                                "DLLs;C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37\\" +
-                                "lib;C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37;" +
-                                "C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\" +
-                                "site-packages;C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\" +
-                        "pyyaml-5.2-py3.7-win-amd64.egg;c:\\projects\\konduit-new\\konduit-serving\\python")
-
+                .pythonPath(pythonPath)
                 .pythonCodePath(pythonCodePath)
                 .pythonInput("default", PythonVariables.Type.NDARRAY.name())
                 .pythonOutput("arr", PythonVariables.Type.NDARRAY.name())
@@ -127,8 +107,6 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
 
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
-               // .inputDataFormat(Input.DataFormat.NUMPY)
-                //.outputDataFormat(Output.DataFormat.NUMPY)
                 .predictionType(Output.PredictionType.RAW)
                 .build();
 
@@ -148,7 +126,7 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
         JsonObject jsonObject = new JsonObject();
 
         //Preparing input NDArray
-        INDArray arr = Nd4j.create(new float[]{1.0f, 2.0f,3.0f,4.0f }, 1, 4);
+        INDArray arr = Nd4j.create(new float[]{1.0f, 2.0f, 3.0f, 4.0f}, 1, 4);
 
         String filePath = new ClassPathResource("data").getFile().getAbsolutePath();
 
