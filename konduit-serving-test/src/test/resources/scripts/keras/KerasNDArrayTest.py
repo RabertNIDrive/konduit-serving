@@ -13,8 +13,9 @@ class KerasTest:
     def test(self,inputarray):
         arr = self.model.predict(inputarray)
         return arr
-
+        print("my_test---------------->"my_test)
+ my_test = np.array(([100, 55, 555, 1000], [1, 0, 5, 10]))
+print("my_test%%%%%%%%%%%%%%%%%%%%%%%"my_test)
 objKeras = KerasTest ()
-print("my_test---", default)
-arr = objKeras.test(default)
+arr = objKeras.test(my_test)
 print(arr)
