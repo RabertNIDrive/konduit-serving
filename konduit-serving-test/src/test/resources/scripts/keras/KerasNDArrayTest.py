@@ -15,6 +15,6 @@ class KerasTest:
         return arr
 
 objKeras = KerasTest ()
-print("my_test---", my_test)
-arr = objKeras.test(my_test)
+print("my_test---", default)
+arr = objKeras.test(default)
 print(arr)

@@ -29,7 +29,6 @@ import ai.konduit.serving.config.ServingConfig;
 import ai.konduit.serving.model.PythonConfig;
 import ai.konduit.serving.output.types.NDArrayOutput;
 import ai.konduit.serving.pipeline.step.PythonStep;
-import ai.konduit.serving.util.ObjectMapperHolder;
 import ai.konduit.serving.verticles.inference.InferenceVerticle;
 import ai.konduit.serving.verticles.numpy.tensorflow.BaseMultiNumpyVerticalTest;
 import com.jayway.restassured.specification.RequestSpecification;
@@ -37,7 +36,6 @@ import com.mashape.unirest.http.Unirest;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -46,6 +44,7 @@ import org.datavec.python.PythonVariables;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.nd4j.jackson.objectmapper.holder.ObjectMapperHolder;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.io.ClassPathResource;
@@ -59,9 +58,6 @@ import java.util.stream.Collectors;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.bytedeco.cpython.presets.python.cachePackages;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(VertxUnitRunner.class)
 @NotThreadSafe
@@ -100,33 +96,30 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
+/*
+
+        String  pythonPath = "C:\\Users\\venkat-nidrive\\.javacpp\\cache\\cpython-3.7.3-1.5.1-windows-x86_64.jar\\org\\bytedeco\\cpython\\windows-x86_64\\\n" +
+                "lib;C:\\Users\\venkat-nidrive\\.javacpp\\cache\\cpython-3.7.3-1.5.1-windows-x86_64.jar\\org\\bytedeco\\cpython\\windows-x86_64\\lib\\python3.7;\n" +
+                "C:\\Users\\venkat-nidrive\\.javacpp\\cache\\cpython-3.7.3-1.5.1-windows-x86_64.jar\\org\\bytedeco\\cpython\\windows-x86_64\\lib\\python3.7\\lib-dynload;\n" +
+                "C:\\Users\\venkat-nidrive\\.javacpp\\cache\\cpython-3.7.3-1.5.1-windows-x86_64.jar\\org\\bytedeco\\cpython\\windows-x86_64\\lib\\python3.7\\site-packages;\n" +
+                "C:\\Users\\venkat-nidrive\\.javacpp\\cache\\numpy-1.16.4-1.5.1-windows-x86_64.jar\\org\\bytedeco\\numpy\\\n" +
+                "windows-x86_64\\python";
+*/
+
         String pythonCodePath = new ClassPathResource("scripts/keras/KerasNDArrayTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
-                .pythonPath("C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\python37.zip;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\DLLs;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages\\win32;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages\\win32\\lib;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages\\Pythonwin;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pyyaml-5.2-py3.7-win-amd64.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\click-7.0-py3.7.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pydatavec-0.1.2-py3.7.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pydl4j-0.1.4-py3.7.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\cython-0.29.14-py3.7-win-amd64.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pandas-0.24.2-py3.7-win-amd64.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\requests_toolbelt-0.9.1-py3.7.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\pyarrow-0.13.0-py3.7-win-amd64.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\numpy-1.16.4-py3.7-win-amd64.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\requests-2.22.0-py3.7.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\python_dateutil-2.8.1-py3.7.egg;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\jnius-1.1.0-py3.7-win-amd64.egg;")
+         //       .pythonPath(pythonPath)
+                .pythonPath("C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37\\python37.zip;" +
+                                "C:\\Users\\venkat-nidrive`AppData\\Local\\Programs\\Python\\Python37\\" +
+                                "DLLs;C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37\\" +
+                                "lib;C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37;" +
+                                "C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\" +
+                                "site-packages;C:\\Users\\venkat-nidrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\" +
+                        "pyyaml-5.2-py3.7-win-amd64.egg;c:\\projects\\konduit-new\\konduit-serving\\python")
 
                 .pythonCodePath(pythonCodePath)
-                .pythonInput("my_test", PythonVariables.Type.NDARRAY.name())
+                .pythonInput("default", PythonVariables.Type.NDARRAY.name())
                 .pythonOutput("arr", PythonVariables.Type.NDARRAY.name())
                 .build();
 
@@ -134,7 +127,7 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
 
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
-                .inputDataFormat(Input.DataFormat.NUMPY)
+               // .inputDataFormat(Input.DataFormat.NUMPY)
                 //.outputDataFormat(Output.DataFormat.NUMPY)
                 .predictionType(Output.PredictionType.RAW)
                 .build();
@@ -155,41 +148,29 @@ public class KerasTestPythonNdArrayInputFormat extends BaseMultiNumpyVerticalTes
         JsonObject jsonObject = new JsonObject();
 
         //Preparing input NDArray
-        INDArray arr = Nd4j.create(new float[]{1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}, 1, 10);
+        INDArray arr = Nd4j.create(new float[]{1.0f, 2.0f,3.0f,4.0f }, 1, 4);
 
         String filePath = new ClassPathResource("data").getFile().getAbsolutePath();
 
-        System.out.println("filePath-----------"+filePath);
+        System.out.println("filePath-----------" + filePath);
 
         //Create new file to write binary input data.
-        File file = new File(filePath+ "/test-input.zip");
+        File file = new File(filePath + "/test-input.zip");
         System.out.println(file.getAbsolutePath());
-
 
         BinarySerde.writeArrayToDisk(arr, file);
         requestSpecification.body(jsonObject.encode().getBytes());
 
         requestSpecification.header("Content-Type", "multipart/form-data");
-        String response = Unirest.post("http://localhost:"+port+"/raw/nd4j")
-                .field("my_test", file)
+        String response = Unirest.post("http://localhost:" + port + "/raw/nd4j")
+                .field("default", file)
                 .asString().getBody();
 
         System.out.print(response);
 
-         //jsonObject.put("my_test", jsonArraouter);
-
- /*       requestSpecification.header("Content-Type", "multipart/form-data");
-        String output = requestSpecification.when()
-                .multiPart("my_test",file)
-                .expect().statusCode(200)
-                .post("raw/numpy").then()
-                .extract()
-                .body().asString();*/
-
-/*        JsonObject jsonObject1 = new JsonObject(body);
-        String ndarraySerde = jsonObject1.getJsonObject("arr").toString();
-        NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);*/
-
+        JsonObject jsonObject1 = new JsonObject(response);
+        String ndarraySerde = jsonObject1.getJsonObject("default").toString();
+        NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);
 
     }
 
