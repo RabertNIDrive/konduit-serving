@@ -33,7 +33,6 @@ import ai.konduit.serving.util.ObjectMapperHolder;
 import ai.konduit.serving.verticles.inference.InferenceVerticle;
 import ai.konduit.serving.verticles.numpy.tensorflow.BaseMultiNumpyVerticalTest;
 import com.jayway.restassured.specification.RequestSpecification;
-import com.mashape.unirest.http.Unirest;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
@@ -46,16 +45,20 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.io.ClassPathResource;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.bytedeco.cpython.presets.python.cachePackages;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(VertxUnitRunner.class)
@@ -95,11 +98,12 @@ public class TensorFlowTestPythonJsonInputFormat extends BaseMultiNumpyVerticalT
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        String pythonCodePath = new ClassPathResource("scripts/KerasJsonTest.py").getFile().getAbsolutePath();
+        String pythonCodePath = new ClassPathResource("scripts/tensorflow/Json_TensorFlow_NDarray.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
+                .pythonCodePath(pythonCodePath)
                 .pythonPath("C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\python37.zip;" +
-                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\DLLs" +
+                        "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\DLLs;" +
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib;" +
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37;" +
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Roaming\\Python\\Python37\\site-packages;" +
@@ -119,19 +123,17 @@ public class TensorFlowTestPythonJsonInputFormat extends BaseMultiNumpyVerticalT
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\requests-2.22.0-py3.7.egg;" +
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\python_dateutil-2.8.1-py3.7.egg;" +
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\jnius-1.1.0-py3.7-win-amd64.egg;")
-
-                .pythonCodePath(pythonCodePath)
-                .pythonInput("JsonInput", PythonVariables.Type.NDARRAY.name())
-                .pythonOutput("score", PythonVariables.Type.NDARRAY.name())
+                .pythonInput("JsonInput", PythonVariables.Type.STR.name())
+                .pythonOutput("prediction", PythonVariables.Type.NDARRAY.name())
                 .build();
 
         PythonStep pythonStepConfig = new PythonStep(pythonConfig);
 
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
-                .inputDataFormat(Input.DataFormat.JSON)
-                .outputDataFormat(Output.DataFormat.NUMPY)
-                .predictionType(Output.PredictionType.RAW)
+               // .inputDataFormat(Input.DataFormat.JSON)
+                //  .outputDataFormat(Output.DataFormat.NUMPY)
+                // .predictionType(Output.PredictionType.RAW)
                 .build();
 
         InferenceConfiguration inferenceConfiguration = InferenceConfiguration.builder()
@@ -144,34 +146,33 @@ public class TensorFlowTestPythonJsonInputFormat extends BaseMultiNumpyVerticalT
 
     @Test(timeout = 60000)
     public void testInferenceResult(TestContext context) throws Exception {
+
         this.context = context;
+
         RequestSpecification requestSpecification = given();
-        requestSpecification.port(3000);
+        requestSpecification.port(port);
         JsonObject jsonObject = new JsonObject();
 
-        File jsonConfig = new ClassPathResource("Json/IrisY.json").getFile();
-        System.out.println("jsonConfig------"+jsonConfig);
+        File json = new ClassPathResource("Json/tensorflowImgPath.json").getFile();
+        jsonObject.put("JsonInput", json.getAbsolutePath());
+        requestSpecification.body(jsonObject.encode());
 
-
-        requestSpecification.body(jsonObject.encode().getBytes());
         requestSpecification.header("Content-Type", "application/json");
-        /*String body = requestSpecification.when()
+        String output = requestSpecification.when()
                 .expect().statusCode(200)
                 .body(not(isEmptyOrNullString()))
-                .post("/raw/dictionary").then()
+                .post("/raw/json").then()
                 .extract()
-                .body().asString();*/
+                .body().asString();
 
-        String output = Unirest.post("http://localhost:3000/RAW/IMAGE")
-                .field("JsonInput", jsonConfig)
-                .asString().getBody();
+        System.out.println("output----------->"+output);
 
         JsonObject jsonObject1 = new JsonObject(output);
         String ndarraySerde = jsonObject1.getJsonObject("default").toString();
         NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);
-        INDArray value = nd.getNdArray();
-        assertEquals(4, value.getDouble(0), 1e-1);
+        INDArray outputArray = nd.getNdArray();
+        INDArray expected = outputArray.get();
+        assertEquals(expected, outputArray);
+
     }
-
-
 }
