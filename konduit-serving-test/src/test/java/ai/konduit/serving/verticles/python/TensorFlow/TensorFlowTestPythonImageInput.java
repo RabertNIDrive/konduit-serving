@@ -166,7 +166,7 @@ public class TensorFlowTestPythonImageInput extends BaseMultiNumpyVerticalTest {
         requestSpecification.body(jsonObject.encode());
         requestSpecification.header("Content-Type", "multipart/form-data");
 
-        File imageFile = new ClassPathResource("data/test_img.png").getFile();
+        File imageFile = new ClassPathResource("data/TensorFlowImageTest.png").getFile();
         System.out.println("imageFile---"+imageFile);
         String output = requestSpecification.when()
                 .multiPart("img",imageFile)

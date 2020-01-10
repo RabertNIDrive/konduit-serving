@@ -1,8 +1,31 @@
-import tensorflow as tf
+import os
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+import numpy as np
+from PIL import Image
+work_dir = os.path.abspath("./src/test/resources/scripts/TensorFlow")
+print("current_path", work_dir)
+sys.path.append(work_dir)
+import input_data
 
-from tensorflow.examples.tutorials.mnist import input_data
+import json
+
+# read file
+#with open('tensorflowImgPath.json', 'r') as myfile:
+with open(JsonInput, 'r') as myfile:
+    data=myfile.read()
+
+# parse file
+obj = json.loads(data)
+print(obj)
+print("ImagePath: " + str(obj['ImagePath']))
+ImgPath = obj['ImagePath']
+print(ImgPath)
+#ImgPath ="test_img.png"
 
 
+# This will print 2, which is the value of bias that we saved
+img = np.invert(Image.open(ImgPath[0]).convert('L')).ravel()
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)  # y labels are oh-encoded
 
 n_train = mnist.train.num_examples  # 55,000
@@ -70,16 +93,10 @@ for i in range(n_iterations):
             [cross_entropy, accuracy],
             feed_dict={X: batch_x, Y: batch_y, keep_prob: 1.0}
             )
-        print(
-            "Iteration",
-            str(i),
-            "\t| Loss =",
-            str(minibatch_loss),
-            "\t| Accuracy =",
-            str(minibatch_accuracy)
-            )
-        
-saver.save(sess, 'S:\\Shiva\\Shiva_tensosFlow_Image',global_step=1000)
 
-print("Model saved as Shiva_tensosFlow_Image")
+saver.save(sess, 'TensorFlowModel_Json',global_step=1000)
+prediction = sess.run(tf.argmax(output_layer, 1), feed_dict={X: [img]})
+# print ("Prediction for test image:", np.squeeze(prediction))
 sess.close()
+
+

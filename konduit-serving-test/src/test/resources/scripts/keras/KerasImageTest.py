@@ -1,14 +1,13 @@
 import numpy as np
-import matplotlib
-matplotlib.use('agg')
+import matplotlib as mpl
+mpl.use('Agg')
+import sys
 import matplotlib.pyplot as plt
 import cv2
 
 # let's keep our keras backend tensorflow quiet
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-# for testing on CPU
-#os.environ['CUDA_VISIBLE_DEVICES'] = ''
 
 # keras imports for the dataset and building our neural network
 from keras.datasets import mnist

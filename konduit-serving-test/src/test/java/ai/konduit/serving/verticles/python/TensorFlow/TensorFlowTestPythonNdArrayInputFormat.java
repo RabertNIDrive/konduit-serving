@@ -33,6 +33,7 @@ import ai.konduit.serving.util.ObjectMapperHolder;
 import ai.konduit.serving.verticles.inference.InferenceVerticle;
 import ai.konduit.serving.verticles.numpy.tensorflow.BaseMultiNumpyVerticalTest;
 import com.jayway.restassured.specification.RequestSpecification;
+import com.mashape.unirest.http.Unirest;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
@@ -48,6 +49,7 @@ import org.junit.runner.RunWith;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.io.ClassPathResource;
+import org.nd4j.serde.binary.BinarySerde;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.File;
@@ -98,8 +100,7 @@ public class TensorFlowTestPythonNdArrayInputFormat extends BaseMultiNumpyVertic
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        String pythonCodePath = new ClassPathResource("scripts/KerasTest.py").getFile().getAbsolutePath();
-       //   String npyFile =  new ClassPathResource("data/input.npy").getFile().getAbsolutePath();
+        String pythonCodePath = new ClassPathResource("scripts/tensorflow/TensorFlowImageTest.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
                 .pythonPath("C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\python37.zip;" +
@@ -123,18 +124,17 @@ public class TensorFlowTestPythonNdArrayInputFormat extends BaseMultiNumpyVertic
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\requests-2.22.0-py3.7.egg;" +
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\python_dateutil-2.8.1-py3.7.egg;" +
                         "C:\\Users\\Rabert-NIdrive\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\jnius-1.1.0-py3.7-win-amd64.egg;")
-
                 .pythonCodePath(pythonCodePath)
-                .pythonInput("my_test", PythonVariables.Type.NDARRAY.name())
-                .pythonOutput("arr", PythonVariables.Type.NDARRAY.name())
+                .pythonInput("img", PythonVariables.Type.NDARRAY.name())
+                .pythonOutput("prediction", PythonVariables.Type.NDARRAY.name())
                 .build();
 
         PythonStep pythonStepConfig = new PythonStep(pythonConfig);
 
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
-                .inputDataFormat(Input.DataFormat.NUMPY)
-                //.outputDataFormat(Output.DataFormat.NUMPY)
+                //.inputDataFormat(Input.DataFormat.NUMPY)
+               // .outputDataFormat(Output.DataFormat.NUMPY)
                 .predictionType(Output.PredictionType.RAW)
                 .build();
 
@@ -151,30 +151,29 @@ public class TensorFlowTestPythonNdArrayInputFormat extends BaseMultiNumpyVertic
         this.context = context;
         RequestSpecification requestSpecification = given();
         requestSpecification.port(port);
-        JsonObject jsonObject = new JsonObject();
-        INDArray arr = Nd4j.create(new float[][] {{1, 0, 5, 10 }, {100,55, 555, 1000}});
-        INDArray inputArray = Nd4j.onesLike(arr);
-        //INDArray inputArray = Nd4j.ones(3, 2);
-        requestSpecification.body(jsonObject.encode().getBytes());
-        jsonObject.put("my_test", new JsonArray(arr.toString()));
-        requestSpecification.body(jsonObject.encode().getBytes());
-        requestSpecification.header("Content-Type", "application/json");
-        String body = requestSpecification.when()
+
+        File imageFile = new ClassPathResource("data/test_img.png").getFile();
+        System.out.println("imageFile---"+imageFile);
+
+        INDArray arr = Nd4j.ones(28, 28);
+        System.out.println("arr ---------"+arr);
+        String filePath = new ClassPathResource("data").getFile().getAbsolutePath();
+        System.out.println("filePath ---------"+filePath);
+
+        //Create new file to write binary input data.
+        File file = new File(filePath+ "/test-input.zip");
+        BinarySerde.writeArrayToDisk(arr, file);
+
+        requestSpecification.header("Content-Type", "multipart/form-data");
+        String output = requestSpecification.when()
+                .multiPart("default", file)
                 .expect().statusCode(200)
-                .body(not(isEmptyOrNullString()))
-                .post("/raw/dictionary").then()
+                .post("raw/nd4j").then()
                 .extract()
                 .body().asString();
-        JsonObject jsonObject1 = new JsonObject(body);
-        String ndarraySerde = jsonObject1.getJsonObject("default").toString();
-        NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);
-        INDArray outputArray = nd.getNdArray();
-        //INDArray expected = inputArray.add(2);
-        INDArray expected = Nd4j.create(new double[][] {{0.1628401,0.7828045,0.05435541}, {0.0,1.0,0.0}});
-        assertEquals(expected, outputArray);
 
+        System.out.println("output ---------"+output);
 
     }
-
 
 }
