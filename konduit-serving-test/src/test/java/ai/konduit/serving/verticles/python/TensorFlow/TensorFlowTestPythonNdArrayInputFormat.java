@@ -17,8 +17,7 @@
  *  *  * SPDX-License-Identifier: Apache-2.0
  *  *  *****************************************************************************
  *
- *
- */
+ * */
 
 package ai.konduit.serving.verticles.python.TensorFlow;
 
@@ -123,8 +122,6 @@ public class TensorFlowTestPythonNdArrayInputFormat extends BaseMultiNumpyVertic
         this.context = context;
         RequestSpecification requestSpecification = given();
         requestSpecification.port(port);
-
-        File imageFile = new ClassPathResource("data/Json_TensorFlow_NDarray.png").getFile();
 
         INDArray arr = Nd4j.ones(28, 28);
         String filePath = new ClassPathResource("data").getFile().getAbsolutePath();
