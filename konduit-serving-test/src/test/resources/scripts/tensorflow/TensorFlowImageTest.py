@@ -1,12 +1,9 @@
 import os
-
 import numpy as np
 from PIL import Image
-
 work_dir = os.path.abspath("./src/test/resources/scripts/TensorFlow")
 print("current_path", work_dir)
 sys.path.append(work_dir)
-
 import input_data
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
