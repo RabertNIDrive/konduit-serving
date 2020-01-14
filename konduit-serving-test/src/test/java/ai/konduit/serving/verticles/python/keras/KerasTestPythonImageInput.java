@@ -48,6 +48,7 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.io.ClassPathResource;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -153,8 +154,7 @@ public class KerasTestPythonImageInput extends BaseMultiNumpyVerticalTest {
         String ndarraySerde = jsonObject1.getJsonObject("default").toString();
         NDArrayOutput nd = ObjectMapperHolder.getJsonMapper().readValue(ndarraySerde, NDArrayOutput.class);
         INDArray outputArray = nd.getNdArray();
-        INDArray expected = outputArray.get();
-        assertEquals(expected, outputArray);
+        assertEquals(7, outputArray.getDouble(0), 1e-1);
 
     }
 
