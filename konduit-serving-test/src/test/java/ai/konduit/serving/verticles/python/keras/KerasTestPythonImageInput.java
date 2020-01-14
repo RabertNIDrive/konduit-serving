@@ -141,7 +141,7 @@ public class KerasTestPythonImageInput extends BaseMultiNumpyVerticalTest {
         requestSpecification.body(jsonObject.encode().getBytes());
         requestSpecification.header("Content-Type", "multipart/form-data");
 
-        File imageFile = new ClassPathResource("data/KerasImageTest.pngp").getFile();
+        File imageFile = new ClassPathResource("data/KerasImageTest.png").getFile();
         String output = requestSpecification.when()
                 .multiPart("imgPath", imageFile)
                 .expect().statusCode(200)
