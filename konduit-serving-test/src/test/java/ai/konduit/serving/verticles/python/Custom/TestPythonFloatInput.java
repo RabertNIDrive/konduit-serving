@@ -21,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.nd4j.linalg.io.ClassPathResource;
 
 import javax.annotation.concurrent.NotThreadSafe;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
@@ -69,7 +68,7 @@ public class TestPythonFloatInput extends BaseMultiNumpyVerticalTest {
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        System.out.println("Python Path--------------"+pythonPath);
+        System.out.println("Python Path--------------" + pythonPath);
 
         String pythonCodePath = new ClassPathResource("scripts/Custom/InputOutputPythonScripts.py").getFile().getAbsolutePath();
 
@@ -84,8 +83,6 @@ public class TestPythonFloatInput extends BaseMultiNumpyVerticalTest {
 
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
-              //  .inputDataFormat(Input.DataFormat.NUMPY)
-               // .predictionType(Output.PredictionType.RAW)
                 .build();
 
         InferenceConfiguration inferenceConfiguration = InferenceConfiguration.builder()

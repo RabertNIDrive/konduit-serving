@@ -123,7 +123,7 @@ public class TestPythonIntegerInput extends BaseMultiNumpyVerticalTest {
         requestSpecification.port(port);
         JsonObject inputJson = new JsonObject();
 
-        Float floatValue = Float.MAX_VALUE;
+        Float floatValue = 100.25f;
         inputJson.put("inputVar", floatValue);
 
         requestSpecification.body(inputJson.encode().getBytes());

@@ -10,7 +10,6 @@ import com.jayway.restassured.specification.RequestSpecification;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -68,8 +67,7 @@ public class TestPythonSTRInput extends BaseMultiNumpyVerticalTest {
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        System.out.println("Python Path--------------"+pythonPath);
-
+        System.out.println("Python Path--------------" + pythonPath);
         String pythonCodePath = new ClassPathResource("scripts/Custom/InputOutputPythonScripts.py").getFile().getAbsolutePath();
 
         PythonConfig pythonConfig = PythonConfig.builder()
@@ -83,8 +81,6 @@ public class TestPythonSTRInput extends BaseMultiNumpyVerticalTest {
 
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
-              //  .inputDataFormat(Input.DataFormat.NUMPY)
-               // .predictionType(Output.PredictionType.RAW)
                 .build();
 
         InferenceConfiguration inferenceConfiguration = InferenceConfiguration.builder()
@@ -102,7 +98,7 @@ public class TestPythonSTRInput extends BaseMultiNumpyVerticalTest {
         RequestSpecification requestSpecification = given();
         requestSpecification.port(port);
         JsonObject jsonObject = new JsonObject();
-        String  strTest= "Test for data types";
+        String strTest = "Test for data types";
         jsonObject.put("inputVar", strTest.toString());
 
         requestSpecification.body(jsonObject.encode().getBytes());

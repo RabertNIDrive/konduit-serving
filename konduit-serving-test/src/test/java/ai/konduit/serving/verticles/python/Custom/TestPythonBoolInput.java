@@ -3,9 +3,7 @@ package ai.konduit.serving.verticles.python.Custom;
 import ai.konduit.serving.InferenceConfiguration;
 import ai.konduit.serving.config.ServingConfig;
 import ai.konduit.serving.model.PythonConfig;
-import ai.konduit.serving.output.types.NDArrayOutput;
 import ai.konduit.serving.pipeline.step.PythonStep;
-import ai.konduit.serving.util.ObjectMapperHolder;
 import ai.konduit.serving.verticles.inference.InferenceVerticle;
 import ai.konduit.serving.verticles.numpy.tensorflow.BaseMultiNumpyVerticalTest;
 import com.jayway.restassured.specification.RequestSpecification;
@@ -20,8 +18,6 @@ import org.datavec.python.PythonVariables;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.io.ClassPathResource;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -72,7 +68,7 @@ public class TestPythonBoolInput extends BaseMultiNumpyVerticalTest {
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(File.pathSeparator));
 
-        System.out.println("Python Path--------------"+pythonPath);
+        System.out.println("Python Path--------------" + pythonPath);
 
         String pythonCodePath = new ClassPathResource("scripts/Custom/InputOutputPythonScripts.py").getFile().getAbsolutePath();
 
@@ -87,8 +83,6 @@ public class TestPythonBoolInput extends BaseMultiNumpyVerticalTest {
 
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
-              //  .inputDataFormat(Input.DataFormat.NUMPY)
-               // .predictionType(Output.PredictionType.RAW)
                 .build();
 
         InferenceConfiguration inferenceConfiguration = InferenceConfiguration.builder()
@@ -106,21 +100,22 @@ public class TestPythonBoolInput extends BaseMultiNumpyVerticalTest {
         RequestSpecification requestSpecification = given();
         requestSpecification.port(port);
         JsonObject jsonObject = new JsonObject();
-        Boolean  booltest= Boolean.FALSE;
+        Boolean booltest = Boolean.FALSE;
         jsonObject.put("inputVar", booltest.toString());
         requestSpecification.body(jsonObject.encode().getBytes());
         requestSpecification.header("Content-Type", "application/json");
+
         String body = requestSpecification.when()
                 .expect().statusCode(200)
                 .body(not(isEmptyOrNullString()))
                 .post("/raw/json").then()
                 .extract()
                 .body().asString();
+
         JsonArray outputJsonArray = new JsonArray(body);
         JsonObject result = outputJsonArray.getJsonObject(0);
         assertTrue(result.containsKey("output"));
         assertEquals(Boolean.FALSE, result.getBoolean("output"));
-
 
 
     }
