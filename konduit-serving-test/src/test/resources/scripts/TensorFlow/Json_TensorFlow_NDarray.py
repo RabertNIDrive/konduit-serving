@@ -6,8 +6,8 @@ tf.disable_v2_behavior()
 import numpy as np
 from PIL import Image
 work_dir = os.path.abspath("./src/test/resources/scripts/TensorFlow")
-print("current_path", work_dir)
 sys.path.append(work_dir)
+print("Working Directory", work_dir)
 import input_data
 
 import json
@@ -17,6 +17,7 @@ import json
 with open(JsonInput, 'r') as myfile:
     data=myfile.read()
 
+print("data----------->: " + data)
 # parse file
 obj = json.loads(data)
 print(obj)
