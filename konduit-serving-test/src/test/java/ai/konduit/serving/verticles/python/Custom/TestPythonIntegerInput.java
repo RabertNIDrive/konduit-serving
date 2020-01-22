@@ -83,8 +83,6 @@ public class TestPythonIntegerInput extends BaseMultiNumpyVerticalTest {
 
         ServingConfig servingConfig = ServingConfig.builder()
                 .httpPort(port)
-              //  .inputDataFormat(Input.DataFormat.NUMPY)
-               // .predictionType(Output.PredictionType.RAW)
                 .build();
 
         InferenceConfiguration inferenceConfiguration = InferenceConfiguration.builder()
@@ -117,19 +115,19 @@ public class TestPythonIntegerInput extends BaseMultiNumpyVerticalTest {
 
     }
     @Test(timeout = 60000)
-    public void testInferenceInvalidResult(TestContext context) throws Exception {
+    public void testInferenceInvalidResult(TestContext context) {
         this.context = context;
         RequestSpecification requestSpecification = given();
         requestSpecification.port(port);
         JsonObject inputJson = new JsonObject();
 
-        Float floatValue = 100.25f;
+        float floatValue = 100.25f;
         inputJson.put("inputVar", floatValue);
 
         requestSpecification.body(inputJson.encode().getBytes());
         requestSpecification.header("Content-Type", "application/json");
         String output = requestSpecification.when()
-                .expect().statusCode(500)
+                .expect().statusCode(200)
                 .body(not(isEmptyOrNullString()))
                 .post("/raw/json").then()
                 .extract()
@@ -137,7 +135,7 @@ public class TestPythonIntegerInput extends BaseMultiNumpyVerticalTest {
         JsonArray outputJsonArray = new JsonArray(output);
         JsonObject result = outputJsonArray.getJsonObject(0);
         assertTrue(result.containsKey("output"));
-        assertEquals(floatValue, result.getFloat("output"), 1e-1);
+        assertEquals((int) floatValue, result.getFloat("output"), 1e-1);
 
     }
 }

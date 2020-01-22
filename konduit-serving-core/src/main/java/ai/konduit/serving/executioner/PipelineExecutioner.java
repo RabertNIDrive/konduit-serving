@@ -558,7 +558,7 @@ public class PipelineExecutioner {
             }
 
             JsonArray jsonArray = new JsonArray(inputJson);
-            ArrowWritableRecordBatch convert = null;
+            ArrowWritableRecordBatch convert;
             try {
                 convert = mapConverter.convert(conversionSchema, jsonArray, transformProcess);
             } catch (Exception e) {

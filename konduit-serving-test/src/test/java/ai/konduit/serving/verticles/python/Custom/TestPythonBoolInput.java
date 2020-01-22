@@ -94,14 +94,14 @@ public class TestPythonBoolInput extends BaseMultiNumpyVerticalTest {
     }
 
     @Test(timeout = 60000)
-    public void testInferenceResult(TestContext context) throws Exception {
+    public void testInferenceResultTrue(TestContext context) throws Exception {
         this.context = context;
 
         RequestSpecification requestSpecification = given();
         requestSpecification.port(port);
         JsonObject jsonObject = new JsonObject();
-        Boolean booltest = Boolean.FALSE;
-        jsonObject.put("inputVar", booltest.toString());
+        Boolean booltest = Boolean.TRUE;
+        jsonObject.put("inputVar", booltest);
         requestSpecification.body(jsonObject.encode().getBytes());
         requestSpecification.header("Content-Type", "application/json");
 
@@ -115,9 +115,31 @@ public class TestPythonBoolInput extends BaseMultiNumpyVerticalTest {
         JsonArray outputJsonArray = new JsonArray(body);
         JsonObject result = outputJsonArray.getJsonObject(0);
         assertTrue(result.containsKey("output"));
-        assertEquals(Boolean.FALSE, result.getBoolean("output"));
-
-
+        assertEquals(booltest, result.getBoolean("output"));
     }
 
+    @Test(timeout = 60000)
+    public void testInferenceResultFalse(TestContext context) throws Exception {
+        this.context = context;
+
+        RequestSpecification requestSpecification = given();
+        requestSpecification.port(port);
+        JsonObject jsonObject = new JsonObject();
+        Boolean booltest = Boolean.FALSE;
+        jsonObject.put("inputVar", booltest);
+        requestSpecification.body(jsonObject.encode().getBytes());
+        requestSpecification.header("Content-Type", "application/json");
+
+        String body = requestSpecification.when()
+                .expect().statusCode(200)
+                .body(not(isEmptyOrNullString()))
+                .post("/raw/json").then()
+                .extract()
+                .body().asString();
+
+        JsonArray outputJsonArray = new JsonArray(body);
+        JsonObject result = outputJsonArray.getJsonObject(0);
+        assertTrue(result.containsKey("output"));
+        assertEquals(booltest, result.getBoolean("output"));
+    }
 }

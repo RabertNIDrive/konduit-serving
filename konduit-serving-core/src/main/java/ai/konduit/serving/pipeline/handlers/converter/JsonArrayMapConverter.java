@@ -190,17 +190,15 @@ public class JsonArrayMapConverter extends BaseJsonArrayConverter {
             jsonArray = newInput;
         }
 
-
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject jsonObject = jsonArray.getJsonObject(i);
             for (int j = 0; j < schema.numColumns(); j++) {
+                Object value = jsonObject.getValue(schema.getName(j));
                 if (schema.getType(j) == ColumnType.NDArray) {
-                    Object value = jsonObject.getValue(schema.getName(j));
                     if (value instanceof String) {
                         INDArray arr = Nd4j.scalar(Double.parseDouble(value.toString()));
                         NDArrayWritable ndArrayWritable = new NDArrayWritable(arr);
                         ArrowConverter.setValue(schema.getType(j), vectors.get(j), ndArrayWritable, i);
-
                     } else if (value instanceof Number) {
                         Number n = (Number) value;
                         INDArray arr = Nd4j.scalar(n.doubleValue());
@@ -210,7 +208,6 @@ public class JsonArrayMapConverter extends BaseJsonArrayConverter {
                         INDArray arr = jsonToNDArray((JsonArray)value);
                         NDArrayWritable ndArrayWritable = new NDArrayWritable(arr);
                         ArrowConverter.setValue(schema.getType(j), vectors.get(j), ndArrayWritable, i);
-
                     } else {
                         throw new IllegalArgumentException("Illegal type found " + value.getClass());
                     }

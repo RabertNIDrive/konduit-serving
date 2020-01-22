@@ -41,10 +41,7 @@ import org.nd4j.base.Preconditions;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Run python code as part of a {@link Pipeline}
@@ -127,16 +124,10 @@ public class PythonStepRunner extends BaseStepRunner {
                     .build();
             this.transformProcesses.put(configEntry.getKey(), transformProcess);
         }
-
-        PythonExecutioner.init();
     }
 
     @Override
-    public void destroy() {
-        //get rid of everything but the main interpreter and clear all the variables but the default one
-        PythonExecutioner.clearNonMainInterpreters();
-        PythonExecutioner.resetAllInterpreters();
-    }
+    public void destroy() { }
 
     @Override
     public Record[] transform(Record[] input) {
@@ -145,7 +136,7 @@ public class PythonStepRunner extends BaseStepRunner {
             if (transformProcesses.containsKey(pipelineStep.inputNameAt(i))) {
                 TransformProcess transformProcess = transformProcesses.get(pipelineStep.inputNameAt(i));
                 Preconditions.checkState(input[i].getRecord() != null && !input[i].getRecord().isEmpty(), "Record should not be empty!");
-                List<List<Writable>> execute = LocalTransformExecutor.execute(Arrays.asList(input[i].getRecord()), transformProcess);
+                List<List<Writable>> execute = LocalTransformExecutor.execute(Collections.singletonList(input[i].getRecord()), transformProcess);
                 ret[i] = new org.datavec.api.records.impl.Record(execute.get(0), null);
             } else {
                 ret[i] = input[i];
